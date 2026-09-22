@@ -65,14 +65,14 @@ export default function LandingIndex() {
 
                     <TestCard
                         title="Tes Kemampuan Kognitif Adaptasi"
-                        subtitle="Mengukur performa pada sembilan area kemampuan kognitif melalui asesmen singkat sekitar 45 menit."
+                        subtitle="Mengukur performa pada sembilan area kemampuan kognitif melalui asesmen singkat sekitar 72 menit."
                         description="Asesmen singkat untuk melihat profil performa pada sembilan area kemampuan kognitif."
                         icon={BrainCircuit}
                         badge="Tersedia / Aktif"
                         isActive={true}
                         href={route('ist.index')}
                         features={[
-                            'Durasi: Sekitar 45 menit',
+                            'Durasi: Sekitar 72 menit',
                             '9 subtes',
                             '104 soal',
                             'Hasil internal',

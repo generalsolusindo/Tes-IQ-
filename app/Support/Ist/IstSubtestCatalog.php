@@ -8,7 +8,7 @@ final class IstSubtestCatalog
 
     public const EXPECTED_QUESTION_COUNT = 176;
 
-    public const EXPECTED_CORE_DURATION_SECONDS = 3660;
+    public const EXPECTED_CORE_DURATION_SECONDS = 4320;
 
     public static function all(): array
     {
@@ -19,9 +19,9 @@ final class IstSubtestCatalog
                 'sequence' => 1,
                 'question_count' => 20,
                 'default_answer_type' => IstAnswerType::SINGLE_CHOICE,
-                'duration_seconds' => 400,
+                'duration_seconds' => 360,
                 'memorization_seconds' => 0,
-                'answering_seconds' => 400,
+                'answering_seconds' => 360,
             ],
             [
                 'code' => 'WA',
@@ -29,9 +29,9 @@ final class IstSubtestCatalog
                 'sequence' => 2,
                 'question_count' => 20,
                 'default_answer_type' => IstAnswerType::SINGLE_CHOICE,
-                'duration_seconds' => 400,
+                'duration_seconds' => 360,
                 'memorization_seconds' => 0,
-                'answering_seconds' => 400,
+                'answering_seconds' => 360,
             ],
             [
                 'code' => 'AN',
@@ -39,9 +39,9 @@ final class IstSubtestCatalog
                 'sequence' => 3,
                 'question_count' => 20,
                 'default_answer_type' => IstAnswerType::SINGLE_CHOICE,
-                'duration_seconds' => 400,
+                'duration_seconds' => 420,
                 'memorization_seconds' => 0,
-                'answering_seconds' => 400,
+                'answering_seconds' => 420,
             ],
             [
                 'code' => 'GE',
@@ -49,9 +49,9 @@ final class IstSubtestCatalog
                 'sequence' => 4,
                 'question_count' => 16,
                 'default_answer_type' => IstAnswerType::SINGLE_CHOICE_WEIGHTED,
-                'duration_seconds' => 300,
+                'duration_seconds' => 480,
                 'memorization_seconds' => 0,
-                'answering_seconds' => 300,
+                'answering_seconds' => 480,
             ],
             [
                 'code' => 'RA',
@@ -59,9 +59,9 @@ final class IstSubtestCatalog
                 'sequence' => 5,
                 'question_count' => 20,
                 'default_answer_type' => IstAnswerType::NUMERIC,
-                'duration_seconds' => 360,
+                'duration_seconds' => 600,
                 'memorization_seconds' => 0,
-                'answering_seconds' => 360,
+                'answering_seconds' => 600,
             ],
             [
                 'code' => 'ZR',
@@ -69,9 +69,9 @@ final class IstSubtestCatalog
                 'sequence' => 6,
                 'question_count' => 20,
                 'default_answer_type' => IstAnswerType::NUMERIC,
-                'duration_seconds' => 360,
+                'duration_seconds' => 600,
                 'memorization_seconds' => 0,
-                'answering_seconds' => 360,
+                'answering_seconds' => 600,
             ],
             [
                 'code' => 'FA',
@@ -79,9 +79,9 @@ final class IstSubtestCatalog
                 'sequence' => 7,
                 'question_count' => 20,
                 'default_answer_type' => IstAnswerType::IMAGE_CHOICE,
-                'duration_seconds' => 480,
+                'duration_seconds' => 420,
                 'memorization_seconds' => 0,
-                'answering_seconds' => 480,
+                'answering_seconds' => 420,
             ],
             [
                 'code' => 'WU',
@@ -89,9 +89,9 @@ final class IstSubtestCatalog
                 'sequence' => 8,
                 'question_count' => 20,
                 'default_answer_type' => IstAnswerType::IMAGE_CHOICE,
-                'duration_seconds' => 600,
+                'duration_seconds' => 540,
                 'memorization_seconds' => 0,
-                'answering_seconds' => 600,
+                'answering_seconds' => 540,
             ],
             [
                 'code' => 'ME',
@@ -99,9 +99,9 @@ final class IstSubtestCatalog
                 'sequence' => 9,
                 'question_count' => 20,
                 'default_answer_type' => IstAnswerType::SINGLE_CHOICE,
-                'duration_seconds' => 360,
-                'memorization_seconds' => 120,
-                'answering_seconds' => 240,
+                'duration_seconds' => 540,
+                'memorization_seconds' => 180,
+                'answering_seconds' => 360,
             ],
         ];
     }
