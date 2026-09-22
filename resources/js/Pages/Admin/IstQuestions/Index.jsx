@@ -125,9 +125,16 @@ export default function Index({ subtests, questions, filters }) {
                             </form>
                         </div>
 
-                        <Link href={route('admin.ist-questions.create')}>
-                            <PrimaryButton>Tambah Soal</PrimaryButton>
-                        </Link>
+                        <div className="flex items-center gap-2">
+                            <Link href={route('admin.ist-questions.review')}>
+                                <SecondaryButton type="button">
+                                    Lihat Visual FA/WU
+                                </SecondaryButton>
+                            </Link>
+                            <Link href={route('admin.ist-questions.create')}>
+                                <PrimaryButton>Tambah Soal</PrimaryButton>
+                            </Link>
+                        </div>
                     </div>
 
                     <div className="overflow-x-auto bg-white shadow-sm sm:rounded-lg">

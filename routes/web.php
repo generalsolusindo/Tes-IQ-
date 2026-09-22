@@ -114,6 +114,9 @@ Route::middleware('auth')->group(function () {
         Route::prefix('admin')
             ->name('admin.')
             ->group(function () {
+                Route::get('ist-questions/review', [IstQuestionController::class, 'review'])
+                    ->name('ist-questions.review');
+
                 Route::resource('ist-questions', IstQuestionController::class)
                     ->parameters(['ist-questions' => 'question'])
                     ->except('show');

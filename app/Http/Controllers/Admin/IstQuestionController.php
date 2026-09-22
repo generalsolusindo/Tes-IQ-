@@ -11,11 +11,13 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class IstQuestionController extends Controller
 {
@@ -24,6 +26,14 @@ class IstQuestionController extends Controller
     private const DIFFICULTIES = ['easy', 'medium', 'hard'];
 
     private const KINDS = [IstQuestion::KIND_SCORED, IstQuestion::KIND_EXAMPLE];
+
+    /**
+     * FA and WU are the only subtests whose bank is entirely image-driven
+     * (SVG shape/cube artwork instead of readable prompt text), so the plain
+     * text list in index() can't be used to sanity-check their content —
+     * this dedicated visual review page is scoped to just those two.
+     */
+    private const REVIEW_SUBTEST_CODES = ['FA', 'WU'];
 
     public function index(Request $request): Response
     {
@@ -46,6 +56,53 @@ class IstQuestionController extends Controller
             'subtests' => $subtests,
             'questions' => $questions,
             'filters' => $request->only(['subtest_id', 'kind', 'search']),
+        ]);
+    }
+
+    public function review(Request $request): Response
+    {
+        $subtests = IstSubtest::query()
+            ->whereIn('code', self::REVIEW_SUBTEST_CODES)
+            ->orderBy('sequence')
+            ->get(['id', 'code', 'name']);
+
+        $selectedSubtestId = $subtests->firstWhere('id', $request->integer('subtest_id'))?->id
+            ?? $subtests->first()?->id;
+
+        $activeFilter = $request->string('active')->toString();
+
+        $questions = IstQuestion::query()
+            ->with(['options' => fn ($query) => $query->orderBy('display_order')])
+            ->where('ist_subtest_id', $selectedSubtestId)
+            ->when($activeFilter === '1', fn ($query) => $query->where('is_active', true))
+            ->when($activeFilter === '0', fn ($query) => $query->where('is_active', false))
+            ->orderByRaw("field(kind, '".IstQuestion::KIND_EXAMPLE."', '".IstQuestion::KIND_SCORED."')")
+            ->orderBy('question_number')
+            ->get()
+            ->map(fn (IstQuestion $question) => [
+                'id' => $question->id,
+                'kind' => $question->kind,
+                'question_number' => $question->question_number,
+                'answer_type' => $question->answer_type,
+                'prompt' => $question->prompt,
+                'image_url' => $this->mediaUrl($question->image_disk, $question->image_path),
+                'image_alt' => $question->image_alt,
+                'is_active' => $question->is_active,
+                'options' => $question->options->map(fn (IstQuestionOption $option) => [
+                    'option_key' => $option->option_key,
+                    'option_text' => $option->option_text,
+                    'image_url' => $this->mediaUrl($option->image_disk, $option->image_path),
+                    'image_alt' => $option->image_alt,
+                    'is_correct' => $option->is_correct,
+                    'score_value' => (float) $option->score_value,
+                ])->values(),
+            ]);
+
+        return Inertia::render('Admin/IstQuestions/Review', [
+            'subtests' => $subtests,
+            'selectedSubtestId' => $selectedSubtestId,
+            'questions' => $questions,
+            'filters' => ['active' => $activeFilter],
         ]);
     }
 
@@ -339,6 +396,19 @@ class IstQuestionController extends Controller
         IstSubtest::query()
             ->where('id', $subtestId)
             ->update(['question_count' => $activeScoredCount]);
+    }
+
+    private function mediaUrl(?string $disk, ?string $path): ?string
+    {
+        if ($path === null || trim($path) === '') {
+            return null;
+        }
+
+        try {
+            return Storage::disk($disk ?: config('filesystems.default'))->url($path);
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     private function duplicateQuestionException(QueryException $exception): ValidationException
