@@ -117,6 +117,12 @@ Route::middleware('auth')->group(function () {
                 Route::get('ist-questions/review', [IstQuestionController::class, 'review'])
                     ->name('ist-questions.review');
 
+                Route::post('ist-questions/{question}/image', [IstQuestionController::class, 'uploadImage'])
+                    ->name('ist-questions.upload-image');
+
+                Route::post('ist-questions/{question}/options/{option}/image', [IstQuestionController::class, 'uploadOptionImage'])
+                    ->name('ist-questions.upload-option-image');
+
                 Route::resource('ist-questions', IstQuestionController::class)
                     ->parameters(['ist-questions' => 'question'])
                     ->except('show');

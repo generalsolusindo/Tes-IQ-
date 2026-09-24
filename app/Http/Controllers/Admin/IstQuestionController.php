@@ -89,6 +89,7 @@ class IstQuestionController extends Controller
                 'image_alt' => $question->image_alt,
                 'is_active' => $question->is_active,
                 'options' => $question->options->map(fn (IstQuestionOption $option) => [
+                    'id' => $option->id,
                     'option_key' => $option->option_key,
                     'option_text' => $option->option_text,
                     'image_url' => $this->mediaUrl($option->image_disk, $option->image_path),
@@ -104,6 +105,57 @@ class IstQuestionController extends Controller
             'questions' => $questions,
             'filters' => ['active' => $activeFilter],
         ]);
+    }
+
+    public function uploadImage(Request $request, IstQuestion $question): RedirectResponse
+    {
+        $request->validate([
+            'image' => ['required', 'image', 'max:5120'],
+        ]);
+
+        $question->loadMissing('subtest:id,code');
+
+        $this->deleteMedia($question->image_disk, $question->image_path);
+
+        $path = $request->file('image')->store(
+            'ist-questions/'.strtolower($question->subtest->code).'/'.$question->kind,
+            'public',
+        );
+
+        $question->update([
+            'image_disk' => 'public',
+            'image_path' => $path,
+            'updated_by' => auth()->id(),
+        ]);
+
+        return back()->with('success', 'Gambar soal berhasil diunggah.');
+    }
+
+    public function uploadOptionImage(Request $request, IstQuestion $question, IstQuestionOption $option): RedirectResponse
+    {
+        abort_unless($option->ist_question_id === $question->id, 404);
+
+        $request->validate([
+            'image' => ['required', 'image', 'max:5120'],
+        ]);
+
+        $question->loadMissing('subtest:id,code');
+
+        $this->deleteMedia($option->image_disk, $option->image_path);
+
+        $path = $request->file('image')->store(
+            'ist-questions/'.strtolower($question->subtest->code).'/options',
+            'public',
+        );
+
+        $option->update([
+            'image_disk' => 'public',
+            'image_path' => $path,
+        ]);
+
+        $question->update(['updated_by' => auth()->id()]);
+
+        return back()->with('success', 'Gambar opsi berhasil diunggah.');
     }
 
     public function create(): Response
@@ -408,6 +460,19 @@ class IstQuestionController extends Controller
             return Storage::disk($disk ?: config('filesystems.default'))->url($path);
         } catch (Throwable) {
             return null;
+        }
+    }
+
+    private function deleteMedia(?string $disk, ?string $path): void
+    {
+        if ($path === null || trim($path) === '') {
+            return;
+        }
+
+        try {
+            Storage::disk($disk ?: config('filesystems.default'))->delete($path);
+        } catch (Throwable) {
+            // Old file may already be missing (e.g. imported from a bank path outside our disk); ignore.
         }
     }
 

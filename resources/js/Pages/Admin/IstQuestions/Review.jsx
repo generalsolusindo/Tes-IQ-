@@ -1,7 +1,7 @@
 import SecondaryButton from '@/Components/SecondaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 const KIND_LABELS = {
     example: 'Soal Contoh',
@@ -16,8 +16,44 @@ function BrokenImageNotice() {
     );
 }
 
-function OptionCard({ option }) {
+function useImageUpload(url) {
+    const inputRef = useRef(null);
+    const [uploading, setUploading] = useState(false);
+
+    const trigger = () => inputRef.current?.click();
+
+    const handleChange = (event) => {
+        const file = event.target.files?.[0];
+        event.target.value = '';
+
+        if (!file) {
+            return;
+        }
+
+        setUploading(true);
+        router.post(
+            url,
+            { image: file },
+            {
+                forceFormData: true,
+                preserveScroll: true,
+                preserveState: true,
+                onFinish: () => setUploading(false),
+            },
+        );
+    };
+
+    return { inputRef, trigger, handleChange, uploading };
+}
+
+function OptionCard({ question, option }) {
     const [broken, setBroken] = useState(false);
+    const upload = useImageUpload(
+        route('admin.ist-questions.upload-option-image', [
+            question.id,
+            option.id,
+        ]),
+    );
 
     return (
         <div
@@ -52,12 +88,30 @@ function OptionCard({ option }) {
             <div className="text-[11px] text-gray-500">
                 skor {option.score_value}
             </div>
+            <input
+                type="file"
+                accept="image/*"
+                ref={upload.inputRef}
+                onChange={upload.handleChange}
+                className="hidden"
+            />
+            <button
+                type="button"
+                onClick={upload.trigger}
+                disabled={upload.uploading}
+                className="text-[11px] font-medium text-indigo-600 hover:text-indigo-800 disabled:opacity-50"
+            >
+                {upload.uploading ? 'Mengunggah...' : 'Upload Gambar'}
+            </button>
         </div>
     );
 }
 
 function QuestionCard({ question }) {
     const [broken, setBroken] = useState(false);
+    const upload = useImageUpload(
+        route('admin.ist-questions.upload-image', question.id),
+    );
 
     return (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -71,6 +125,22 @@ function QuestionCard({ question }) {
                             Nonaktif
                         </span>
                     )}
+                    <input
+                        type="file"
+                        accept="image/*"
+                        ref={upload.inputRef}
+                        onChange={upload.handleChange}
+                        className="hidden"
+                    />
+                    <SecondaryButton
+                        type="button"
+                        onClick={upload.trigger}
+                        disabled={upload.uploading}
+                    >
+                        {upload.uploading
+                            ? 'Mengunggah...'
+                            : 'Upload Gambar'}
+                    </SecondaryButton>
                     <Link
                         href={route('admin.ist-questions.edit', question.id)}
                     >
@@ -105,7 +175,11 @@ function QuestionCard({ question }) {
             {question.options.length > 0 && (
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
                     {question.options.map((option) => (
-                        <OptionCard key={option.option_key} option={option} />
+                        <OptionCard
+                            key={option.option_key}
+                            question={question}
+                            option={option}
+                        />
                     ))}
                 </div>
             )}
