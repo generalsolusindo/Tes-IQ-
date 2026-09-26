@@ -6,6 +6,7 @@ import IstStateNotice from '@/Components/IST/IstStateNotice';
 import IstSubtestProgress from '@/Components/IST/IstSubtestProgress';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { faExampleOptionImage } from '@/Support/IST/faVisuals';
+import { preferImage } from '@/Support/IST/preferImage';
 import {
     WU_EXAMPLE_PROMPT,
     WU_INSTRUCTION_CONTENT,
@@ -202,7 +203,7 @@ export default function Instruction({
                                                                     </div>
 
                                                                     <IstImageViewer
-                                                                        image={faExampleOptionImage(optionKey)}
+                                                                        image={preferImage(option?.image, faExampleOptionImage(optionKey))}
                                                                         fallbackAlt={`Pilihan bentuk FA ${optionKey}`}
                                                                     />
                                                                 </div>
@@ -213,10 +214,12 @@ export default function Instruction({
                                             )}
 
                                             <p className="whitespace-pre-line text-sm leading-7 text-zinc-200">
-                                                {isWu ? WU_EXAMPLE_PROMPT : example?.prompt ?? 'Teks contoh belum tersedia.'}
+                                                {isWu
+                                                    ? example?.prompt || WU_EXAMPLE_PROMPT
+                                                    : example?.prompt ?? 'Teks contoh belum tersedia.'}
                                             </p>
                                             <IstImageViewer
-                                                image={isWu ? wuExampleTargetImage() : example?.image}
+                                                image={isWu ? preferImage(example?.image, wuExampleTargetImage()) : example?.image}
                                                 fallbackAlt="Ilustrasi contoh soal"
                                                 className="mt-4"
                                             />
@@ -243,7 +246,7 @@ export default function Instruction({
                                 </div>
 
                                 <IstImageViewer
-                                    image={wuMasterImage(optionKey)}
+                                    image={preferImage(option?.image, wuMasterImage(optionKey))}
                                     fallbackAlt={`Kubus acuan ${optionKey}`}
                                 />
                             </div>

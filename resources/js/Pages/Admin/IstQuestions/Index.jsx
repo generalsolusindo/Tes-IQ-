@@ -131,6 +131,11 @@ export default function Index({ subtests, questions, filters }) {
                                     Lihat Visual FA/WU
                                 </SecondaryButton>
                             </Link>
+                            <Link href={route('admin.ist-questions.me-preview')}>
+                                <SecondaryButton type="button">
+                                    Preview Soal ME
+                                </SecondaryButton>
+                            </Link>
                             <Link href={route('admin.ist-questions.create')}>
                                 <PrimaryButton>Tambah Soal</PrimaryButton>
                             </Link>

@@ -117,6 +117,9 @@ Route::middleware('auth')->group(function () {
                 Route::get('ist-questions/review', [IstQuestionController::class, 'review'])
                     ->name('ist-questions.review');
 
+                Route::get('ist-questions/me-preview', [IstQuestionController::class, 'mePreview'])
+                    ->name('ist-questions.me-preview');
+
                 Route::post('ist-questions/{question}/image', [IstQuestionController::class, 'uploadImage'])
                     ->name('ist-questions.upload-image');
 

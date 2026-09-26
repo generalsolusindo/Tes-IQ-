@@ -107,6 +107,72 @@ class IstQuestionController extends Controller
         ]);
     }
 
+    /**
+     * ME questions only name an initial letter, so they can't be checked
+     * without the memorization word bank stored on the subtest. This page
+     * shows both side by side and resolves each prompt's initial against the
+     * bank so admins can spot keys that point at the wrong category.
+     */
+    public function mePreview(Request $request): Response
+    {
+        $subtest = IstSubtest::query()->where('code', 'ME')->first();
+
+        $activeFilter = $request->string('active')->toString();
+
+        $groups = [];
+
+        if ($subtest !== null) {
+            $decoded = json_decode((string) $subtest->memorization_content, true);
+
+            foreach ((is_array($decoded) ? $decoded['groups'] ?? [] : []) as $group) {
+                if (! is_array($group)) {
+                    continue;
+                }
+
+                $groups[] = [
+                    'key' => (string) ($group['key'] ?? ''),
+                    'name' => (string) ($group['name'] ?? ''),
+                    'words' => array_values(array_filter(
+                        array_map(fn ($word) => trim((string) $word), (array) ($group['words'] ?? [])),
+                        fn (string $word) => $word !== '',
+                    )),
+                ];
+            }
+        }
+
+        $questions = $subtest === null ? collect() : IstQuestion::query()
+            ->with(['options' => fn ($query) => $query->orderBy('display_order')])
+            ->where('ist_subtest_id', $subtest->id)
+            ->when($activeFilter === '1', fn ($query) => $query->where('is_active', true))
+            ->when($activeFilter === '0', fn ($query) => $query->where('is_active', false))
+            ->orderByRaw("field(kind, '".IstQuestion::KIND_EXAMPLE."', '".IstQuestion::KIND_SCORED."')")
+            ->orderBy('question_number')
+            ->get()
+            ->map(fn (IstQuestion $question) => [
+                'id' => $question->id,
+                'kind' => $question->kind,
+                'question_number' => $question->question_number,
+                'prompt' => $question->prompt,
+                'example_explanation' => $question->example_explanation,
+                'is_active' => $question->is_active,
+                'options' => $question->options->map(fn (IstQuestionOption $option) => [
+                    'option_key' => $option->option_key,
+                    'option_text' => $option->option_text,
+                    'is_correct' => $option->is_correct,
+                    'score_value' => (float) $option->score_value,
+                ])->values(),
+            ]);
+
+        return Inertia::render('Admin/IstQuestions/MePreview', [
+            'subtest' => $subtest?->only([
+                'id', 'code', 'name', 'instruction_content', 'memorization_seconds', 'answering_seconds',
+            ]),
+            'groups' => $groups,
+            'questions' => $questions,
+            'filters' => ['active' => $activeFilter],
+        ]);
+    }
+
     public function uploadImage(Request $request, IstQuestion $question): RedirectResponse
     {
         $request->validate([

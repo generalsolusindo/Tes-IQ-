@@ -1,6 +1,7 @@
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import IstImageViewer from '@/Components/IST/IstImageViewer';
 import { faQuestionOptionImage } from '@/Support/IST/faVisuals';
+import { preferImage } from '@/Support/IST/preferImage';
 import {
     WU_QUESTION_PROMPT,
     wuMasterImage,
@@ -34,9 +35,11 @@ export default function IstQuestionCard({
     const isFa = subtestCodeNormalized === 'FA';
     const isWu = subtestCodeNormalized === 'WU';
     const usesFixedVisualMasters = isFa || isWu;
-    const displayedPrompt = isWu ? WU_QUESTION_PROMPT : question.prompt;
+    const displayedPrompt = isWu
+        ? question.prompt || WU_QUESTION_PROMPT
+        : question.prompt;
     const displayedQuestionImage = isWu
-        ? wuQuestionTargetImage(question.displayOrder)
+        ? preferImage(question.image, wuQuestionTargetImage(question.displayOrder))
         : question.image;
     const options = Array.isArray(question.options) ? question.options : [];
     const isChoice = choiceTypes.has(answerType);
@@ -159,9 +162,9 @@ export default function IstQuestionCard({
 
                                             <IstImageViewer
                                                 image={isFa
-                                                    ? faQuestionOptionImage(question.displayOrder, optionKey)
+                                                    ? preferImage(option?.image, faQuestionOptionImage(question.displayOrder, optionKey))
                                                     : isWu
-                                                      ? wuMasterImage(optionKey)
+                                                      ? preferImage(option?.image, wuMasterImage(optionKey))
                                                       : option?.image}
                                                 fallbackAlt={isFa
                                                     ? `Pilihan bentuk FA ${optionKey}`
