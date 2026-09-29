@@ -57,6 +57,7 @@ class MerchantController extends Controller
             'startUrls' => [
                 'ist' => route('ist.index.merchant', $merchant),
                 'disc' => route('disc.index.merchant', $merchant),
+                'competency' => route('competency.index.merchant', $merchant),
             ],
         ]);
     }

@@ -140,6 +140,17 @@ export default function Index({ merchants, filters }) {
                                                 >
                                                     Link DISC
                                                 </a>
+                                                <a
+                                                    href={route(
+                                                        'competency.index.merchant',
+                                                        merchant.slug,
+                                                    )}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-100"
+                                                >
+                                                    Link Kompetensi
+                                                </a>
                                             </div>
                                         </td>
                                         <td className="px-4 py-3 text-right">

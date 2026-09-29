@@ -66,6 +66,10 @@ export default function Edit({ merchant, startUrls }) {
 
                         <StartUrlRow label="Tes IST" url={startUrls.ist} />
                         <StartUrlRow label="Tes DISC" url={startUrls.disc} />
+                        <StartUrlRow
+                            label="Tes Kompetensi"
+                            url={startUrls.competency}
+                        />
                     </div>
                 </div>
             </div>
