@@ -54,6 +54,7 @@ function NAV_ITEMS() {
 export default function Dashboard({ todayAttendance }) {
     const { auth } = usePage().props;
     const [submitting, setSubmitting] = useState(false);
+    const [statusMessage, setStatusMessage] = useState(null);
     const [error, setError] = useState(null);
 
     const hasMasuk = !!todayAttendance?.jam_masuk;
@@ -65,7 +66,9 @@ export default function Dashboard({ todayAttendance }) {
 
         try {
             const photo = await captureSelfie();
+            setStatusMessage('Mencari lokasi GPS akurat, mohon tunggu...');
             const position = await getCurrentPosition();
+            setStatusMessage('Mengirim absen...');
             const formData = buildAbsensiFormData(photo, position);
             const url =
                 type === 'masuk'
@@ -79,10 +82,14 @@ export default function Dashboard({ todayAttendance }) {
                         Object.values(errors)[0] ?? 'Gagal mengirim absen.',
                     );
                 },
-                onFinish: () => setSubmitting(false),
+                onFinish: () => {
+                    setSubmitting(false);
+                    setStatusMessage(null);
+                },
             });
         } catch (caughtError) {
             setSubmitting(false);
+            setStatusMessage(null);
             setError(caughtError?.message ?? 'Gagal mengambil lokasi/foto.');
         }
     }
@@ -167,6 +174,12 @@ export default function Dashboard({ todayAttendance }) {
                 {error && (
                     <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">
                         {error}
+                    </p>
+                )}
+
+                {!error && statusMessage && (
+                    <p className="mt-4 rounded-xl bg-blue-50 p-3 text-sm text-blue-700">
+                        {statusMessage}
                     </p>
                 )}
 

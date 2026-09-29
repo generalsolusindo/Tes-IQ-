@@ -4,6 +4,19 @@ const GEOLOCATION_ERROR_MESSAGES = {
     3: 'Waktu permintaan lokasi habis. Coba lagi.',
 };
 
+// Matches the backend's MAX_GPS_ACCURACY_METERS (AbsensiController) — kept
+// as a separate constant since frontend/backend can't share PHP/JS code.
+const MAX_GPS_ACCURACY_METERS = 50;
+const LOCATION_ACQUIRE_TIMEOUT_MS = 15000;
+
+/**
+ * A phone's first GPS fix after requesting location is often a coarse
+ * network/cell-based estimate (accuracy 60-100m+); the chip only narrows
+ * to an accurate fix after a few seconds of satellite lock. A one-shot
+ * getCurrentPosition() call was returning that first coarse fix, forcing
+ * karyawan to retry manually. This watches for updates until one is
+ * accurate enough (or the timeout hits), returning the best fix seen.
+ */
 export function getCurrentPosition() {
     return new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
@@ -11,16 +24,53 @@ export function getCurrentPosition() {
             return;
         }
 
-        navigator.geolocation.getCurrentPosition(
-            resolve,
-            (error) =>
+        let best = null;
+        let watchId = null;
+
+        const cleanup = () => {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+            clearTimeout(timeoutId);
+        };
+
+        const timeoutId = setTimeout(() => {
+            cleanup();
+
+            if (best) {
+                resolve(best);
+            } else {
+                reject(new Error(GEOLOCATION_ERROR_MESSAGES[3]));
+            }
+        }, LOCATION_ACQUIRE_TIMEOUT_MS);
+
+        watchId = navigator.geolocation.watchPosition(
+            (position) => {
+                if (!best || position.coords.accuracy < best.coords.accuracy) {
+                    best = position;
+                }
+
+                if (position.coords.accuracy <= MAX_GPS_ACCURACY_METERS) {
+                    cleanup();
+                    resolve(position);
+                }
+            },
+            (error) => {
+                cleanup();
+
+                if (best) {
+                    resolve(best);
+                    return;
+                }
+
                 reject(
                     new Error(
                         GEOLOCATION_ERROR_MESSAGES[error.code] ??
                             'Gagal mendapatkan lokasi.',
                     ),
-                ),
-            { enableHighAccuracy: true, timeout: 15000 },
+                );
+            },
+            { enableHighAccuracy: true, maximumAge: 0 },
         );
     });
 }
