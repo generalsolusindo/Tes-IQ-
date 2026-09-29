@@ -12,5 +12,13 @@ export default defineConfig({
         }),
         react(),
     ],
+    server: {
+        watch: {
+            // vendor/storage hold PHP dependencies and runtime files Vite
+            // never needs to hot-reload — watching them anyway is what
+            // blows past the OS's inotify watch limit on this machine.
+            ignored: ['**/vendor/**', '**/storage/**'],
+        },
+    },
 });
 

@@ -22,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'merchant' => \App\Http\Middleware\EnsureUserIsMerchant::class,
+            'active' => \App\Http\Middleware\EnsureUserIsActive::class,
+            'karyawan' => \App\Http\Middleware\EnsureUserIsKaryawan::class,
+            'absensi.hrd' => \App\Http\Middleware\EnsureUserCanManageAbsensi::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

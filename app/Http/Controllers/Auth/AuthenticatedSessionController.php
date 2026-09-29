@@ -33,9 +33,15 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $home = $request->user()->isMerchant()
-            ? route('merchant.dashboard', absolute: false)
-            : route('dashboard', absolute: false);
+        $user = $request->user();
+
+        $home = match (true) {
+            $user->isKaryawan() && ! $user->isAktif() => route('pending-approval', absolute: false),
+            $user->isKaryawan() => route('karyawan.dashboard', absolute: false),
+            $user->isHrd() => route('hrd.karyawan.index', absolute: false),
+            $user->isMerchant() => route('merchant.dashboard', absolute: false),
+            default => route('dashboard', absolute: false),
+        };
 
         return redirect()->intended($home);
     }

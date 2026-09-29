@@ -38,6 +38,15 @@ return [
             'report' => false,
         ],
 
+        'absensi_photos' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/absensi-photos'),
+            'url' => rtrim((string) env('APP_URL', 'http://localhost'), '/').'/absensi-photos',
+            'serve' => true,
+            'throw' => false,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

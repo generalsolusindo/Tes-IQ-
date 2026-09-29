@@ -6,4 +6,9 @@
     /* Tema panel admin (lihat resources/js/Layouts/AuthenticatedLayout.jsx) memakai
        Inter, mengikuti gaya profile.html — sisi lain aplikasi tetap pakai Figtree. */
     --font-admin: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+    /* Tema modul Absensi (lihat resources/js/Components/Absensi/) — panel
+       navy gradient khas CRM internal, sengaja berbeda dari tema IST/DISC. */
+    --color-absensi-navy-start: #0b1437;
+    --color-absensi-navy-end: #1b2a6b;
 }
