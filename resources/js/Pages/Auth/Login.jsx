@@ -1,8 +1,10 @@
-import Button from '@/Components/Absensi/Button';
-import Input from '@/Components/Absensi/Input';
-import AuthLayout from '@/Layouts/Absensi/AuthLayout';
+import Checkbox from '@/Components/Checkbox';
+import InputError from '@/Components/InputError';
+import InputLabel from '@/Components/InputLabel';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
+import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Lock, ShieldCheck, User } from 'lucide-react';
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -20,115 +22,89 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <AuthLayout
-            heading="Satu portal untuk seluruh sistem internal General Solusindo."
-            description="Masuk untuk mengakses tes psikotes rekrutmen dan absensi karyawan dalam satu sistem yang terintegrasi."
-        >
-            <Head title="Masuk" />
-
-            <h2 className="text-2xl font-bold text-gray-900">Masuk</h2>
-            <p className="mt-1 text-sm text-gray-500">
-                Silakan masuk menggunakan akun Anda.
-            </p>
+        <GuestLayout>
+            <Head title="Log in" />
 
             {status && (
-                <div className="mt-4 text-sm font-medium text-green-600">
+                <div className="mb-4 text-sm font-medium text-green-600">
                     {status}
                 </div>
             )}
 
-            <form onSubmit={submit} className="mt-6 space-y-4">
+            <form onSubmit={submit}>
                 <div>
-                    <label
-                        htmlFor="email"
-                        className="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                        Email
-                    </label>
-                    <Input
+                    <InputLabel htmlFor="email" value="Email" />
+
+                    <TextInput
                         id="email"
                         type="email"
-                        icon={User}
+                        name="email"
                         value={data.email}
+                        className="mt-1 block w-full"
                         autoComplete="username"
-                        autoFocus
+                        isFocused={true}
                         onChange={(e) => setData('email', e.target.value)}
                     />
-                    {errors.email && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {errors.email}
-                        </p>
-                    )}
+
+                    <InputError message={errors.email} className="mt-2" />
                 </div>
 
-                <div>
-                    <label
-                        htmlFor="password"
-                        className="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                        Password
-                    </label>
-                    <Input
+                <div className="mt-4">
+                    <InputLabel htmlFor="password" value="Password" />
+
+                    <TextInput
                         id="password"
                         type="password"
-                        icon={Lock}
+                        name="password"
                         value={data.password}
+                        className="mt-1 block w-full"
                         autoComplete="current-password"
                         onChange={(e) => setData('password', e.target.value)}
                     />
-                    {errors.password && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {errors.password}
-                        </p>
-                    )}
+
+                    <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div className="flex items-center justify-between">
-                    <label className="flex items-center gap-2 text-sm text-gray-600">
-                        <input
-                            type="checkbox"
+                <div className="mt-4 block">
+                    <label className="flex items-center">
+                        <Checkbox
+                            name="remember"
                             checked={data.remember}
                             onChange={(e) =>
                                 setData('remember', e.target.checked)
                             }
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
-                        Ingat saya
+                        <span className="ms-2 text-sm text-gray-600">
+                            Remember me
+                        </span>
                     </label>
+                </div>
 
+                <div className="mt-4 flex items-center justify-end">
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}
-                            className="text-sm text-blue-600 hover:underline"
+                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                         >
-                            Lupa password?
+                            Forgot your password?
                         </Link>
                     )}
-                </div>
 
-                <Button
-                    type="submit"
-                    className="w-full justify-center"
-                    disabled={processing}
-                >
-                    Masuk
-                </Button>
+                    <PrimaryButton className="ms-4" disabled={processing}>
+                        Log in
+                    </PrimaryButton>
+                </div>
             </form>
 
-            <p className="mt-6 text-center text-sm text-gray-500">
+            <p className="mt-4 text-center text-sm text-gray-600">
                 Karyawan baru?{' '}
                 <Link
                     href={route('karyawan.register')}
-                    className="font-medium text-blue-600 hover:underline"
+                    className="rounded-md text-indigo-600 underline hover:text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
                     Daftar di sini
                 </Link>
             </p>
-
-            <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-gray-400">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Akses khusus pengguna internal
-            </p>
-        </AuthLayout>
+        </GuestLayout>
     );
 }
